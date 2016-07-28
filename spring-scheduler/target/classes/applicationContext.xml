@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="myTask" class="com.xyula.snippets.spring.scheculer.MyTask"/>
+
+    <!--<bean id="schedulerTask" class="org.springframework.scheduling.timer.MethodInvokingTimerTaskFactoryBean">-->
+        <!--<property name="targetObject" ref="myTask"/>-->
+        <!--<property name="targetMethod" value="sayHello"/>-->
+    <!--</bean>-->
+
+    <!--<bean id="timerTask" class="org.springframework.scheduling.timer.ScheduledTimerTask">-->
+        <!--<property name="timerTask" ref="schedulerTask"/>-->
+        <!--<property name="delay" value="1000"/>-->
+        <!--<property name="period" value="5000"/>-->
+    <!--</bean>-->
+
+    <!--<bean class="org.springframework.scheduling.timer.TimerFactoryBean">-->
+        <!--<property name="scheduledTimerTasks">-->
+            <!--<list>-->
+                <!--<ref local="timerTask"/>-->
+            <!--</list>-->
+        <!--</property>-->
+    <!--</bean>-->
+
+    <!--quartz-->
+    <bean name="quartzJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+        <property name="jobClass" value="com.xyula.snippets.spring.scheculer.QuartzJob"/>
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="myTask" value-ref="myTask"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+        <property name="jobDetail" ref="quartzJob"/>
+        <property name="repeatInterval" value="5000"/>
+        <property name="startDelay" value="1000"/>
+    </bean>
+
+    <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail" ref="quartzJob"/>
+        <property name="cronExpression" value="0/5 * * * * ?"/>
+    </bean>
+
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="jobDetails">
+            <list>
+                <ref bean="quartzJob"/>
+            </list>
+        </property>
+        <property name="triggers">
+            <list>
+                <ref bean="simpleTrigger"/>
+            </list>
+        </property>
+    </bean>
+
+</beans>
