@@ -10,5 +10,6 @@
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
 
-       <jsxws:endpoint id="trafficService" implementor="com.bsy.webservice.Impl.TrafficServiceImpl" address="/trafficService"/>
+    <jsxws:endpoint id="trafficService" implementor="com.bsy.webservice.Impl.TrafficViolateImpl"
+                    address="/trafficService"/>
 </beans>

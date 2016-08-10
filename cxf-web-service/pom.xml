@@ -14,8 +14,20 @@
     </properties>
 
     <dependencies>
-        <!--以JDK自动的 jax-ws 方式运行，不需要任何依赖-->
+        <!--configuration begin-->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-configuration2</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.2</version>
+        </dependency>
+        <!--configuration end-->
 
+        <!--以JDK自动的 jax-ws 方式运行，不需要下面的任何依赖-->
 
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -51,7 +63,7 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.8</version>
+            <version>1.2.12</version>
         </dependency>
         <!--log end-->
 
@@ -78,28 +90,4 @@
         <!--test end-->
     </dependencies>
 
-    <build>
-        <finalName>traffic</finalName>
-        <plugins>
-            <!--<plugin>-->
-                <!--<groupId>org.apache.cxf</groupId>-->
-                <!--<artifactId>cxf-java2ws-plugin</artifactId>-->
-                <!--<version>${cxf.version}</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<id>process-classes</id>-->
-                        <!--<phase>process-classes</phase>-->
-                        <!--<configuration>-->
-                            <!--<className>com.bsy.webservice.Impl.TrafficServiceImplImpl</className>-->
-                            <!--<genWsdl>true</genWsdl>-->
-                            <!--<verbose>true</verbose>-->
-                        <!--</configuration>-->
-                        <!--<goals>-->
-                            <!--<goal>java2ws</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
-        </plugins>
-    </build>
 </project>
