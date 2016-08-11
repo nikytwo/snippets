@@ -164,7 +164,7 @@ public class HttpPostUtils {
             while ((i = inputStream.read()) != -1) {
                 baos.write(i);
             }
-            result = baos.toString();
+            result = new String(baos.toByteArray(), "UTF-8");
         } finally {
             if (con != null) {
                 con.disconnect();

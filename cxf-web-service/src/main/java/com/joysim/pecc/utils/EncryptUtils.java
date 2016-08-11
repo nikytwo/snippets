@@ -128,9 +128,9 @@ public final class EncryptUtils {
      * @return 加密过的字符串
      * @throws NoSuchAlgorithmException
      */
-    public static String SHA1Encode(String inStr) throws NoSuchAlgorithmException {
+    public static String SHA1Encode(String inStr) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest md = getMessageDigest("SHA-1"); // 选择SHA-1，也可以选择MD5
-        return bytetoString(md.digest(inStr.getBytes()));
+        return bytetoString(md.digest(inStr.getBytes("UTF-8")));
     }
 
     /**
@@ -141,9 +141,9 @@ public final class EncryptUtils {
      * @return 生成的MD5信息
      * @throws NoSuchAlgorithmException
      */
-    public static String MD5Encode(String inStr) throws NoSuchAlgorithmException {
+    public static String MD5Encode(String inStr) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest md = getMessageDigest("MD5");
-        return bytetoString(md.digest(inStr.getBytes()));
+        return bytetoString(md.digest(inStr.getBytes("UTF-8")));
     }
 
     // 合成密码和盐

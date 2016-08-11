@@ -17,13 +17,15 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Created by Laijie on 2016/8/9.
- *
+ * <p/>
  * 车辆违章查询代理服务
  */
 @WebService
@@ -37,23 +39,37 @@ public class TrafficViolateImpl implements TrafficViolate {
     public static final String WEB_SERVICE_ERROR = "{\"result\":-1,\"message\":\"web service 代理失败\" }";
     public static final String ERROR_MESSAGE = "调用 web service 代理失败";
 
-    private static String USER_NAME = "bsy";
+    private final String userName;
     //默认地址
-    private static String SERVER_URI = "http://test.haicar.cn/joysim-car/server";
+    private final String serverUri;
     //默认密钥
-    private static String SECRET_KEY = "b732b4cc0cfacb44591f878195952f52";
+    private final String secretKey;
 
-    static {
+    public TrafficViolateImpl() throws ConfigurationException {
+        // java.version
+        Properties props = System.getProperties();
+        logger.info("Java的运行环境版本：" + props.getProperty("java.version"));
+        logger.info("Default Charset:" + Charset.defaultCharset());
+        logger.info("file.encoding:" + System.getProperty("file.encoding"));
+        logger.info("Default Charset:" + Charset.defaultCharset());
         // 读取配置
         Configurations configs = new Configurations();
+        Configuration config = configs.properties(new File("api-server.properties"));
+        serverUri = config.getString("haicar.api.baseUri", "http://test.haicar.cn/joysim-car/server");
+        userName = config.getString("haicar.api.username", "bsy");
+        secretKey = config.getString("haicar.api.secretKey", "b732b4cc0cfacb44591f878195952f52");
+        logger.info("haicar.api.baseUri:" + serverUri);
+        logger.info("haicar.api.username:" + userName);
+        logger.info("haicar.api.secretKey:" + secretKey);
+        logger.info("加载配置文件成功...");
+    }
+
+    public static TrafficViolateImpl instance() {
         try {
-            Configuration config = configs.properties(new File("api-server.properties"));
-            SERVER_URI = config.getString("haicar.api.baseUri", SERVER_URI);
-            USER_NAME = config.getString("haicar.api.username", USER_NAME);
-            SECRET_KEY = config.getString("haicar.api.secretKey", SECRET_KEY);
-            logger.info("加载配置文件成功...");
+            return new TrafficViolateImpl();
         } catch (ConfigurationException e) {
-            logger.error("加载配置文件失败,异常信息", e);
+            logger.error("TrafficViolate 初始化失败...", e);
+            throw new RuntimeException("TrafficViolate 初始化失败...", e);
         }
     }
 
@@ -82,7 +98,7 @@ public class TrafficViolateImpl implements TrafficViolate {
             map.put("mobilePhone", phone);
 
             String param = HttpPostUtils.hashMapToJson(map);
-            String uri = SERVER_URI + VIOLATION_ORDER_URI;
+            String uri = serverUri + VIOLATION_ORDER_URI;
 
             // 生成签名头信息
             Map<String, String> headers = buildHeaders(param, uri);
@@ -101,7 +117,7 @@ public class TrafficViolateImpl implements TrafficViolate {
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("extNo", extNo);
             String param = HttpPostUtils.hashMapToJson(map);
-            String uri = SERVER_URI + VIOLATION_SUBMIT_URI;
+            String uri = serverUri + VIOLATION_SUBMIT_URI;
 
             // 生成签名头信息
             Map<String, String> headers = buildHeaders(param, uri);
@@ -121,7 +137,7 @@ public class TrafficViolateImpl implements TrafficViolate {
             // 参数
             map.put("extNo", extNo);
             String param = HttpPostUtils.hashMapToJson(map);
-            String uri = SERVER_URI + VIOLATION_QUERY_ORDER_URI;
+            String uri = serverUri + VIOLATION_QUERY_ORDER_URI;
 
             // 生成签名头信息
             Map<String, String> headers = buildHeaders(param, uri);
@@ -142,7 +158,7 @@ public class TrafficViolateImpl implements TrafficViolate {
             map.put("cityId", cityId);
             map.put("behaviorCode", behaviorCode);
             String param = HttpPostUtils.hashMapToJson(map);
-            String uri = SERVER_URI + VIOLATION_JUDGE_URI;
+            String uri = serverUri + VIOLATION_JUDGE_URI;
 
             // 生成签名头信息
             Map<String, String> headers = buildHeaders(param, uri);
@@ -166,12 +182,14 @@ public class TrafficViolateImpl implements TrafficViolate {
             map.put("engine", engineNo);
 
             String param = HttpPostUtils.hashMapToJson(map);
-            String uri = SERVER_URI + GET_CAR_PECCANCY_URI;
+            String uri = serverUri + GET_CAR_PECCANCY_URI;
 
             // 生成签名头信息
             Map<String, String> headers = buildHeaders(param, uri);
 
-            return HttpPostUtils.http(uri, param.getBytes("UTF-8"), headers);
+            String rst = HttpPostUtils.http(uri, param.getBytes("UTF-8"), headers);
+            logger.info("rst:" + rst);
+            return rst;
         } catch (IOException e) {
             logger.error(ERROR_MESSAGE, e);
 
@@ -180,22 +198,27 @@ public class TrafficViolateImpl implements TrafficViolate {
     }
 
     private Map<String, String> buildHeaders(String param, String uri) {
+        logger.info("param:" + param.toString());
+        logger.info("uri:" + uri);
+        logger.info("userName:" + userName);
+        logger.info("secretKey:" + secretKey);
         Map<String, String> headers = new HashMap<String, String>();
         String date = String.valueOf(new Date().getTime());
-        final StringBuilder builder = new StringBuilder(USER_NAME);
+        final StringBuilder builder = new StringBuilder(userName);
         builder.append(":");
-        builder.append(HttpRequestSiningHelper.createRequestSignature("POST", date, uri, param, SECRET_KEY));// 生成签名头信息
+        builder.append(HttpRequestSiningHelper.createRequestSignature("POST", date, uri, param, secretKey));// 生成签名头信息
         headers.put(HmacAttributes.X_HMAC_AUTH_SIGNATURE, builder.toString());
         headers.put(HmacAttributes.X_HMAC_AUTH_METHOD, "HmacMD5");
         headers.put(HmacAttributes.X_HMAC_AUTH_DATE, date);
+        logger.info(headers.toString());
         return headers;
     }
 
     public static void main(String[] args) {
         System.out.println("Starting Server");
-        TrafficViolateImpl implementor = new TrafficViolateImpl();
+        TrafficViolateImpl implementor = TrafficViolateImpl.instance();
         // todo 可配置端口和路径
-        String address = "http://localhost:8080/trafficService";
+        String address = "http://localhost:8080/TrafficViolate";
 
         // Endpoint 为 jdk6+ 自带的
         // Endpoint.publish(address, implementor);
