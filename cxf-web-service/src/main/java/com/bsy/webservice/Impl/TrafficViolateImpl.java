@@ -193,6 +193,7 @@ public class TrafficViolateImpl implements TrafficViolate {
         } catch (IOException e) {
             logger.error(ERROR_MESSAGE, e);
 
+            // todo message with e.message
             return WEB_SERVICE_ERROR;
         }
     }
@@ -212,24 +213,5 @@ public class TrafficViolateImpl implements TrafficViolate {
         headers.put(HmacAttributes.X_HMAC_AUTH_DATE, date);
         logger.info(headers.toString());
         return headers;
-    }
-
-    public static void main(String[] args) {
-        System.out.println("Starting Server");
-        TrafficViolateImpl implementor = TrafficViolateImpl.instance();
-        // todo 可配置端口和路径
-        String address = "http://localhost:8080/TrafficViolate";
-
-        // Endpoint 为 jdk6+ 自带的
-        // Endpoint.publish(address, implementor);
-
-        // cxf 提供的
-        JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
-        svrFactory.setServiceClass(TrafficViolateImpl.class);
-        svrFactory.setAddress(address);
-        svrFactory.setServiceBean(implementor);
-        svrFactory.getInInterceptors().add(new LoggingInInterceptor());
-        svrFactory.getOutInterceptors().add(new LoggingOutInterceptor());
-        svrFactory.create();
     }
 }

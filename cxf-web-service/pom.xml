@@ -28,6 +28,13 @@
         </dependency>
         <!--configuration end-->
 
+        <!-- 解析命令行参数(http://jcommander.org/) -->
+        <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.48</version>
+        </dependency>
+
         <!--以JDK自动的 jax-ws 方式运行，不需要下面的任何依赖-->
 
         <dependency>
@@ -120,7 +127,7 @@
                             <!-- 生成的manifest中classpath的前缀，因为要把第三方jar放到lib目录下，所以classpath的前缀是lib/ -->
                             <classpathPrefix>lib/</classpathPrefix>
                             <!-- 应用的main class -->
-                            <mainClass>com.bsy.webservice.Impl.TrafficViolateImpl</mainClass>
+                            <mainClass>com.bsy.webservice.App</mainClass>
                         </manifest>
                     </archive>
                     <!-- 过滤掉不希望包含在jar中的文件 -->
@@ -156,7 +163,7 @@
             <!--&lt;!&ndash;</descriptorRefs>&ndash;&gt;-->
             <!--&lt;!&ndash;<archive>&ndash;&gt;-->
             <!--&lt;!&ndash;<manifest>&ndash;&gt;-->
-            <!--&lt;!&ndash;<mainClass>com.bsy.webservice.Impl.TrafficViolateImpl</mainClass>&ndash;&gt;-->
+            <!--&lt;!&ndash;<mainClass>com.bsy.webservice.App</mainClass>&ndash;&gt;-->
             <!--&lt;!&ndash;</manifest>&ndash;&gt;-->
             <!--&lt;!&ndash;</archive>&ndash;&gt;-->
             <!--</configuration>-->
@@ -207,10 +214,10 @@
                         <program>
                             <id>app</id>
                             <!-- 启动类 -->
-                            <mainClass>com.bsy.webservice.Impl.TrafficViolateImpl</mainClass>
+                            <mainClass>com.bsy.webservice.App</mainClass>
                             <!-- 命令行启动参数 -->
                             <!--<commandLineArguments>-->
-                            <!--<commandLineArgument>arg1</commandLineArgument>-->
+                            <!--<commandLineArgument>-p 8090</commandLineArgument>-->
                             <!--<commandLineArgument>arg2</commandLineArgument>-->
                             <!--</commandLineArguments>-->
                             <!--<jvmSettings>-->
