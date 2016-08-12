@@ -193,6 +193,7 @@ public class HttpPostUtils {
 
     public static String hashMapToJson(Map<String, Object> map) {
         String string = "{";
+        // todo 不要这样设计，因为遍历的顺序是根据健的 hashCode 来进行的。会导致无法实现跨语言的调用
         for (Iterator it = map.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry e = (Map.Entry) it.next();
             string += "\"" + e.getKey() + "\":";
