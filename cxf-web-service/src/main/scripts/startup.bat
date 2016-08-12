@@ -1,0 +1,2 @@
+
+call ./bin/app.bat
