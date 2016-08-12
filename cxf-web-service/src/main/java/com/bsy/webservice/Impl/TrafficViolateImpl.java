@@ -7,9 +7,6 @@ import com.joysim.pecc.utils.HttpRequestSiningHelper;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +33,7 @@ public class TrafficViolateImpl implements TrafficViolate {
     public static final String VIOLATION_QUERY_ORDER_URI = "/violation/query/order";
     public static final String VIOLATION_JUDGE_URI = "/violation/judge";
     public static final String GET_CAR_PECCANCY_URI = "/wz/getCarPeccancy/v3";
-    public static final String WEB_SERVICE_ERROR = "{\"result\":-1,\"message\":\"web service 代理失败\" }";
+    public static final String WEB_SERVICE_ERROR = "{\"result\":-1,\"message\":\"web service 代理失败：%s\" }";
     public static final String ERROR_MESSAGE = "调用 web service 代理失败";
 
     private final String userName;
@@ -107,7 +104,7 @@ public class TrafficViolateImpl implements TrafficViolate {
         } catch (IOException e) {
             logger.error(ERROR_MESSAGE, e);
 
-            return WEB_SERVICE_ERROR;
+            return getErrorMessage(e);
         }
     }
 
@@ -126,7 +123,7 @@ public class TrafficViolateImpl implements TrafficViolate {
         } catch (IOException e) {
             logger.error(ERROR_MESSAGE, e);
 
-            return WEB_SERVICE_ERROR;
+            return getErrorMessage(e);
         }
     }
 
@@ -146,7 +143,7 @@ public class TrafficViolateImpl implements TrafficViolate {
         } catch (IOException e) {
             logger.error(ERROR_MESSAGE, e);
 
-            return WEB_SERVICE_ERROR;
+            return getErrorMessage(e);
         }
     }
 
@@ -167,7 +164,7 @@ public class TrafficViolateImpl implements TrafficViolate {
         } catch (IOException e) {
             logger.error(ERROR_MESSAGE, e);
 
-            return WEB_SERVICE_ERROR;
+            return getErrorMessage(e);
         }
     }
 
@@ -193,8 +190,7 @@ public class TrafficViolateImpl implements TrafficViolate {
         } catch (IOException e) {
             logger.error(ERROR_MESSAGE, e);
 
-            // todo message with e.message
-            return WEB_SERVICE_ERROR;
+            return getErrorMessage(e);
         }
     }
 
@@ -213,5 +209,9 @@ public class TrafficViolateImpl implements TrafficViolate {
         headers.put(HmacAttributes.X_HMAC_AUTH_DATE, date);
         logger.info(headers.toString());
         return headers;
+    }
+
+    private String getErrorMessage(IOException e) {
+        return String.format(WEB_SERVICE_ERROR, e.getMessage());
     }
 }
