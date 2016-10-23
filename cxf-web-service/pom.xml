@@ -28,6 +28,13 @@
         </dependency>
         <!--configuration end-->
 
+        <!-- 解析命令行参数(http://jcommander.org/) -->
+        <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.48</version>
+        </dependency>
+
         <!--以JDK自动的 jax-ws 方式运行，不需要下面的任何依赖-->
 
         <dependency>
@@ -118,6 +125,158 @@
                     <testFailureIgnore>true</testFailureIgnore>
                 </configuration>
             </plugin>
+
+            <!-- The configuration of maven-jar-plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <!-- The configuration of the plugin -->
+                <configuration>
+                    <!-- Configuration of the archiver -->
+                    <archive>
+                        <!-- 生成的jar中，不要包含pom.xml和pom.properties这两个文件 -->
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                        <!-- Manifest specific configuration -->
+                        <!-- 下面两种方式均需要在此设置 Manifest -->
+                        <manifest>
+                            <!-- 是否要把第三方jar放到manifest的classpath中 -->
+                            <addClasspath>true</addClasspath>
+                            <!-- 生成的manifest中classpath的前缀，因为要把第三方jar放到lib目录下，所以classpath的前缀是lib/ -->
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <!-- 应用的main class -->
+                            <mainClass>com.bsy.webservice.App</mainClass>
+                        </manifest>
+                    </archive>
+                    <!-- 过滤掉不希望包含在jar中的文件 -->
+                    <excludes>
+                        <exclude>${project.basedir}/logs/*</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- 打包成可执行程序: 方法一(不含执行脚本) start -->
+            <!-- The configuration of maven-assembly-plugin -->
+            <!--<plugin>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-assembly-plugin</artifactId>-->
+            <!--<version>2.4</version>-->
+            <!--&lt;!&ndash; The configuration of the plugin &ndash;&gt;-->
+            <!--<configuration>-->
+            <!--&lt;!&ndash;Specifies the configuration file of the assembly plugin&ndash;&gt;-->
+            <!--<descriptors>-->
+            <!--<descriptor>src/assembly/assembly.xml</descriptor>-->
+            <!--</descriptors>-->
+            <!--&lt;!&ndash;<descriptorRefs>&ndash;&gt;-->
+            <!--&lt;!&ndash;<descriptorRef>jar-with-dependencies</descriptorRef>&ndash;&gt;-->
+            <!--&lt;!&ndash;</descriptorRefs>&ndash;&gt;-->
+            <!--&lt;!&ndash;<archive>&ndash;&gt;-->
+            <!--&lt;!&ndash;<manifest>&ndash;&gt;-->
+            <!--&lt;!&ndash;<mainClass>com.bsy.webservice.App</mainClass>&ndash;&gt;-->
+            <!--&lt;!&ndash;</manifest>&ndash;&gt;-->
+            <!--&lt;!&ndash;</archive>&ndash;&gt;-->
+            <!--</configuration>-->
+            <!--<executions>-->
+            <!--<execution>-->
+            <!--<id>make-assembly</id>-->
+            <!--<phase>package</phase>-->
+            <!--<goals>-->
+            <!--<goal>single</goal>-->
+            <!--</goals>-->
+            <!--</execution>-->
+            <!--</executions>-->
+            <!--</plugin>-->
+            <!-- 打包成可执行程序: 方法一(不含执行脚本) end -->
+
+            <!-- 打包成可执行程序: 方法二(含执行脚本) start -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>appassembler-maven-plugin</artifactId>
+                <version>1.10</version>
+                <configuration>
+                    <!-- 生成linux, windows两种平台的执行脚本 -->
+                    <platforms>
+                        <platform>windows</platform>
+                        <platform>unix</platform>
+                    </platforms>
+                    <!-- 根目录 -->
+                    <assembleDirectory>${project.build.directory}/${project.artifactId}-${project.version}-bin
+                    </assembleDirectory>
+                    <!-- 打包的jar，以及maven依赖的jar放到这个目录里面 (默认repo) -->
+                    <repositoryName>lib</repositoryName>
+                    <!-- lib目录中jar的存放规则，默认是${groupId}/${artifactId}的目录格式，flat表示直接把jar放到lib目录 -->
+                    <repositoryLayout>flat</repositoryLayout>
+                    <!-- 可执行脚本的目录 (默认bin)，无法设置成根目录 -->
+                    <!--<binFolder>bin</binFolder>-->
+                    <!-- 配置文件的目标目录 (默认etc) -->
+                    <configurationDirectory>conf</configurationDirectory>
+                    <!-- 拷贝配置文件到上面的目录中 -->
+                    <copyConfigurationDirectory>true</copyConfigurationDirectory>
+                    <!-- 从哪里拷贝配置文件 (默认src/main/config) -->
+                    <configurationSourceDirectory>src/main/resources</configurationSourceDirectory>
+                    <encoding>UTF-8</encoding>
+                    <logsDirectory>logs</logsDirectory>
+                    <!--<tempDirectory>tmp</tempDirectory>-->
+                    <!-- Extra JVM arguments that will be included in the bin scripts -->
+                    <extraJvmArguments>-Xms128m</extraJvmArguments>
+                    <programs>
+                        <program>
+                            <id>app</id>
+                            <!-- 启动类 -->
+                            <mainClass>com.bsy.webservice.App</mainClass>
+                            <!-- 命令行启动参数 -->
+                            <!--<commandLineArguments>-->
+                            <!--<commandLineArgument>-p 8090</commandLineArgument>-->
+                            <!--<commandLineArgument>arg2</commandLineArgument>-->
+                            <!--</commandLineArguments>-->
+                            <!--<jvmSettings>-->
+                            <!--<extraArguments>-->
+                            <!--<extraArgument>-server</extraArgument>-->
+                            <!--<extraArgument>-Xmx2G</extraArgument>-->
+                            <!--<extraArgument>-Xms2G</extraArgument>-->
+                            <!--</extraArguments>-->
+                            <!--</jvmSettings>-->
+                        </program>
+                    </programs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-bin</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>assemble</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/bin.xml</descriptor>
+                    </descriptors>
+                </configuration>
+            </plugin>
+            <!-- 打包成可执行程序: 方法二(含执行脚本) end -->
         </plugins>
     </build>
 </project>

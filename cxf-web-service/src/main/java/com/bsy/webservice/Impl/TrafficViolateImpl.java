@@ -7,9 +7,6 @@ import com.joysim.pecc.utils.HttpRequestSiningHelper;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +33,7 @@ public class TrafficViolateImpl implements TrafficViolate {
     public static final String VIOLATION_QUERY_ORDER_URI = "/violation/query/order";
     public static final String VIOLATION_JUDGE_URI = "/violation/judge";
     public static final String GET_CAR_PECCANCY_URI = "/wz/getCarPeccancy/v3";
-    public static final String WEB_SERVICE_ERROR = "{\"result\":-1,\"message\":\"web service 代理失败\" }";
+    public static final String WEB_SERVICE_ERROR = "{\"result\":-1,\"message\":\"web service 代理失败：%s\" }";
     public static final String ERROR_MESSAGE = "调用 web service 代理失败";
 
     private final String userName;
@@ -107,7 +104,7 @@ public class TrafficViolateImpl implements TrafficViolate {
         } catch (IOException e) {
             logger.error(ERROR_MESSAGE, e);
 
-            return WEB_SERVICE_ERROR;
+            return getErrorMessage(e);
         }
     }
 
@@ -126,7 +123,7 @@ public class TrafficViolateImpl implements TrafficViolate {
         } catch (IOException e) {
             logger.error(ERROR_MESSAGE, e);
 
-            return WEB_SERVICE_ERROR;
+            return getErrorMessage(e);
         }
     }
 
@@ -146,7 +143,7 @@ public class TrafficViolateImpl implements TrafficViolate {
         } catch (IOException e) {
             logger.error(ERROR_MESSAGE, e);
 
-            return WEB_SERVICE_ERROR;
+            return getErrorMessage(e);
         }
     }
 
@@ -167,7 +164,7 @@ public class TrafficViolateImpl implements TrafficViolate {
         } catch (IOException e) {
             logger.error(ERROR_MESSAGE, e);
 
-            return WEB_SERVICE_ERROR;
+            return getErrorMessage(e);
         }
     }
 
@@ -193,7 +190,7 @@ public class TrafficViolateImpl implements TrafficViolate {
         } catch (IOException e) {
             logger.error(ERROR_MESSAGE, e);
 
-            return WEB_SERVICE_ERROR;
+            return getErrorMessage(e);
         }
     }
 
@@ -214,22 +211,7 @@ public class TrafficViolateImpl implements TrafficViolate {
         return headers;
     }
 
-    public static void main(String[] args) {
-        System.out.println("Starting Server");
-        TrafficViolateImpl implementor = TrafficViolateImpl.instance();
-        // todo 可配置端口和路径
-        String address = "http://localhost:8080/TrafficViolate";
-
-        // Endpoint 为 jdk6+ 自带的
-        // Endpoint.publish(address, implementor);
-
-        // cxf 提供的
-        JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
-        svrFactory.setServiceClass(TrafficViolateImpl.class);
-        svrFactory.setAddress(address);
-        svrFactory.setServiceBean(implementor);
-        svrFactory.getInInterceptors().add(new LoggingInInterceptor());
-        svrFactory.getOutInterceptors().add(new LoggingOutInterceptor());
-        svrFactory.create();
+    private String getErrorMessage(IOException e) {
+        return String.format(WEB_SERVICE_ERROR, e.getMessage());
     }
 }
