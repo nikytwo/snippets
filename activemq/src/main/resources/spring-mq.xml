@@ -22,22 +22,27 @@
         <constructor-arg ref="activemqPoolFactory" />
         <!-- pub/sub模型（发布/订阅） -->
         <property name="pubSubDomain" value="true" />
+        <!--todo 使用 MessageConverter-->
     </bean>
 
     <!-- ActiveMQ 消费者方法配置，下面配置生成2个listener -->
-    <!--todo 事务-->
-    <jms:listener-container connection-factory="activemqPoolFactory">
+    <!-- 使用事务 -->
+    <jms:listener-container connection-factory="activemqPoolFactory"
+                            acknowledge="transacted">
         <jms:listener destination="xyula.activity" ref="activemqClient" method="activity"/>
         <jms:listener destination="xyula.delete"  ref="activemqClient"  method="delete"/>
     </jms:listener-container>
 
     <!-- 定义Topic监听器 -->
+    <!-- fixme 使用事务时任然会丢消息??? -->
     <jms:listener-container destination-type="topic" container-type="default" connection-factory="activemqPoolFactory"
-                            acknowledge="auto">
+                            acknowledge="transacted">
         <jms:listener destination="xyula.topic" ref="topicReceiver1"/>
         <jms:listener destination="xyula.topic" ref="topicReceiver2"/>
     </jms:listener-container>
 
+    <!--todo 使用 MessageListenerAdapter-->
+    <!--todo 使用 MessageConverter-->
 
     <!-- ActiveMQ 消费者工具类配置 -->
     <bean id="activemqClient" class="com.xyula.snippets.activemq.ActiveMQClient"/>

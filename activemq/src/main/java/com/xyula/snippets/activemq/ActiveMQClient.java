@@ -7,12 +7,15 @@ import org.springframework.jms.core.MessageCreator;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * activemq Listener（监听消息的消费者） 与 消息的生产者.
  * Created by Lai Jie on 2017/3/28.
  */
 public class ActiveMQClient {
+    private static AtomicInteger cnt = new AtomicInteger(0);
     private static final String ACTIVITY_NAME = "xyula.activity";
     private static final String DELETE_NAME = "xyula.delete";
 
@@ -60,6 +63,14 @@ public class ActiveMQClient {
      * @param message 接收到的信息
      */
     public void delete(String message) {
+        System.out.println(cnt.incrementAndGet());
+        Random random = new Random();
+        int rd = random.nextInt(2);
+        if (rd == 1) {
+            System.out.println("exception");
+            throw new RuntimeException("test");
+        }
+
         System.out.println("接收到消息-delete： " + message);
     }
 }
