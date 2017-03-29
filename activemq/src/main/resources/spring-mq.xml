@@ -34,7 +34,7 @@
     </jms:listener-container>
 
     <!-- 定义Topic监听器 -->
-    <!-- fixme 使用事务时任然会丢消息??? -->
+    <!-- 使用事务 -->
     <jms:listener-container destination-type="topic" container-type="default" connection-factory="activemqPoolFactory"
                             acknowledge="transacted">
         <jms:listener destination="xyula.topic" ref="topicReceiver1"/>

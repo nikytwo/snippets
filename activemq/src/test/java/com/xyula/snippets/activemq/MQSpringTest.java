@@ -32,6 +32,9 @@ public class MQSpringTest {
         Thread.sleep(3000);
 
         activemqClient.sendActivityMessage("ccc");
+
+        // 给予足够时间等待消息接收
+        Thread.sleep(10000);
     }
 
     @Test
@@ -43,5 +46,8 @@ public class MQSpringTest {
         Thread.sleep(3000);
 
         publisher.send("ccc");
+
+        // 给予足够时间等待消息接收
+        Thread.sleep(10000);
     }
 }
