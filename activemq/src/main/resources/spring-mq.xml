@@ -16,6 +16,14 @@
     <!-- Spring JMS Template, 默认开启消息持久化 -->
     <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate" c:connectionFactory-ref="activemqPoolFactory"/>
 
+    <!-- 定义JmsTemplate的Topic类型 -->
+    <bean id="jmsTopicTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <!-- 这个connectionFactory对应的是我们定义的Spring提供的那个ConnectionFactory对象 -->
+        <constructor-arg ref="activemqPoolFactory" />
+        <!-- pub/sub模型（发布/订阅） -->
+        <property name="pubSubDomain" value="true" />
+    </bean>
+
     <!-- ActiveMQ 消费者方法配置，下面配置生成2个listener -->
     <!--todo 事务-->
     <jms:listener-container connection-factory="activemqPoolFactory">
@@ -23,6 +31,25 @@
         <jms:listener destination="xyula.delete"  ref="activemqClient"  method="delete"/>
     </jms:listener-container>
 
+    <!-- 定义Topic监听器 -->
+    <jms:listener-container destination-type="topic" container-type="default" connection-factory="activemqPoolFactory"
+                            acknowledge="auto">
+        <jms:listener destination="xyula.topic" ref="topicReceiver1"/>
+        <jms:listener destination="xyula.topic" ref="topicReceiver2"/>
+    </jms:listener-container>
+
+
     <!-- ActiveMQ 消费者工具类配置 -->
     <bean id="activemqClient" class="com.xyula.snippets.activemq.ActiveMQClient"/>
+
+    <!--消息发布者-->
+    <bean id="topicPublisher" class="com.xyula.snippets.activemq.TopicPublisher"/>
+    <!--消息订阅者-->
+    <bean id="topicReceiver1" class="com.xyula.snippets.activemq.TopicReceiver">
+        <constructor-arg value="receiver-1"/>
+    </bean>
+    <bean id="topicReceiver2" class="com.xyula.snippets.activemq.TopicReceiver">
+        <constructor-arg value="receiver-2"/>
+    </bean>
+
 </beans>

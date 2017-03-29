@@ -17,6 +17,8 @@ public class MQSpringTest {
 
     @Resource
     private ActiveMQClient activemqClient;
+    @Resource
+    private TopicPublisher publisher;
 
     @Test
     public void test() throws InterruptedException {
@@ -30,7 +32,16 @@ public class MQSpringTest {
         Thread.sleep(3000);
 
         activemqClient.sendActivityMessage("ccc");
+    }
 
+    @Test
+    public void topic() throws InterruptedException {
+        publisher.send("aaa");
+        Thread.sleep(3000);
 
+        publisher.send("bbb");
+        Thread.sleep(3000);
+
+        publisher.send("ccc");
     }
 }
